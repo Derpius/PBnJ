@@ -58,9 +58,9 @@ Shader "PartShaderRedux"
 			return UNITY_SAMPLE_TEX2DARRAY(_TexArray, float3(uv, index));
 		}
 
-		fixed4 _Color;
-		fixed4 _MaterialColors[50];
-		fixed4 _MaterialData[50];
+		float4 _Color;
+		float4 _MaterialColors[50];
+		float4 _MaterialData[50];
 
         struct Input
         {
@@ -82,7 +82,7 @@ Shader "PartShaderRedux"
             fixed4 detailColour = SampleTexArray(UNITY_PASS_TEX2DARRAY(_DetailTextures), IN.uv_DetailTextures, IN.detailIdx);
 			fixed4 normalColour = SampleTexArray(UNITY_PASS_TEX2DARRAY(_NormalMapTextures), IN.uv_NormalMapTextures, IN.normalIdx);
 
-            o.Albedo = detailColour.rgb * _Color.rgb;
+            o.Albedo = float3(IN.detailIdx / 5.f, 1.f, 1.f);//detailColour.rgb * _Color.rgb;
 			o.Normal = normalColour.rgb;
             o.Metallic = 0.f;
             o.Smoothness = 0.f;

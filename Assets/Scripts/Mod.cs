@@ -11,6 +11,26 @@ namespace Assets.Scripts
 	using UnityEngine;
 	using HarmonyLib;
 
+	[HarmonyPatch(typeof(Craft.Theme), "LoadMaterial", MethodType.Normal)]
+	class ThemeLoadMaterialPatch
+	{
+		public static void PatchMaterial(in Material material)
+		{
+			if (material.shader.name == "Jundroo/SR Standard/SrStandardPartShader")
+			{
+				Debug.Log("[PBnJ] Patching material...");
+
+				material.shader = Assets.Scripts.Mod.Instance.partShader;
+			}
+		}
+
+		[HarmonyPostfix]
+		static void Postfix(ref Material __result)
+		{
+			PatchMaterial(__result);
+		}
+	}
+
 	/// <summary>
 	/// A singleton object representing this mod that is instantiated and initialize when the mod is loaded.
 	/// </summary>
@@ -41,21 +61,16 @@ namespace Assets.Scripts
 			Harmony harmony = new Harmony("PhysicallyBasedAndJuno");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
 
+			PatchCurrentMaterials();
+
 			Debug.Log("PBnJ Loaded Successfully");
 		}
-	}
 
-	[HarmonyPatch(typeof(Craft.Theme), "LoadMaterial", MethodType.Normal)]
-	class ThemeLoadMaterialPatch
-	{
-		[HarmonyPostfix]
-		static void Postfix(ref Material __result)
+		private void PatchCurrentMaterials()
 		{
-			if (__result.shader.name == "Jundroo/SR Standard/SrStandardPartShader")
+			foreach (Material material in Resources.FindObjectsOfTypeAll<Material>())
 			{
-				Debug.Log("[PBnJ] Patching material...");
-
-				__result.shader = Mod.Instance.partShader;
+				ThemeLoadMaterialPatch.PatchMaterial(material);
 			}
 		}
 	}
