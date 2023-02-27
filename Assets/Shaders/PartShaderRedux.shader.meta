@@ -5,7 +5,7 @@ ShaderImporter:
   defaultTextures:
   - _DetailTextures: {instanceID: 0}
   - _NormalMapTextures: {instanceID: 0}
-  - _MRAOTextures: {fileID: 18700000, guid: 4bf93308ce26dfd4a810093c77b27702, type: 2}
+  - _MRAOTextures: {instanceID: 0}
   - _DecalTexture: {instanceID: 0}
   - _MainTex: {instanceID: 0}
   nonModifiableTextures: []

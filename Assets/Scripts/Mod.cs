@@ -21,6 +21,7 @@ namespace Assets.Scripts
 				Debug.Log("[PBnJ] Patching material...");
 
 				material.shader = Assets.Scripts.Mod.Instance.partShader;
+				material.SetTexture("_MRAOTextures", Assets.Scripts.Mod.Instance.mraoTextures);
 			}
 		}
 
@@ -37,6 +38,7 @@ namespace Assets.Scripts
 	public class Mod : ModApi.Mods.GameMod
 	{
 		public Shader partShader;
+		public Texture2DArray mraoTextures;
 
 		/// <summary>
 		/// Prevents a default instance of the <see cref="Mod"/> class from being created.
@@ -57,6 +59,7 @@ namespace Assets.Scripts
 
 			//originalPartShader = Shader.Find("Jundroo/SR Standard/SrStandardPartShader");
 			partShader = this.ResourceLoader.LoadAsset<Shader>("Assets/Shaders/PartShaderRedux.shader");
+			mraoTextures = this.ResourceLoader.LoadAsset<Texture2DArray>("Assets/Textures/MRAO.asset");
 
 			Harmony harmony = new Harmony("PhysicallyBasedAndJuno");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
