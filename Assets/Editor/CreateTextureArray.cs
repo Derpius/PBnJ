@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using UnityEngine;
 using UnityEditor;
@@ -52,3 +54,5 @@ public class CreateTextureArray
 		return a.dimension == b.dimension && a.format == b.format;
 	}
 }
+
+#endif

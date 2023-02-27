@@ -2,7 +2,12 @@ fileFormatVersion: 2
 guid: 2f569e0da8161f7439d6640e65fc5608
 ShaderImporter:
   externalObjects: {}
-  defaultTextures: []
+  defaultTextures:
+  - _DetailTextures: {instanceID: 0}
+  - _NormalMapTextures: {instanceID: 0}
+  - _MRAOTextures: {fileID: 18700000, guid: 4bf93308ce26dfd4a810093c77b27702, type: 2}
+  - _DecalTexture: {instanceID: 0}
+  - _MainTex: {instanceID: 0}
   nonModifiableTextures: []
   preprocessorOverride: 0
   userData: 
