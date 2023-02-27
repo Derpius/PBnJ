@@ -15,6 +15,7 @@ Shader "PartShaderRedux"
 		[Space(20)] [Header(Textures)]
 		_DetailTextures ("Detail Textures", 2DArray) = "" {}
 		_NormalMapTextures ("Normal Maps Textures", 2DArray) = "" {}
+		_MRAOTextures ("Metalness, roughness, ambient occlusion textures", 2DArray) = "" {}
 		_DecalTexture ("Decal Texture", 2D) = "black" {}
 		_DecalTextureMaterialIds ("Decal Materials", Vector) = (0,0,1,1)
 		_UseDecalTexture ("Use Decal Texture", Float) = 0
@@ -53,6 +54,7 @@ Shader "PartShaderRedux"
 
 		UNITY_DECLARE_TEX2DARRAY(_DetailTextures);
 		UNITY_DECLARE_TEX2DARRAY(_NormalMapTextures);
+		UNITY_DECLARE_TEX2DARRAY(_MRAOTextures);
 
 		fixed4 SampleTexArray(UNITY_ARGS_TEX2DARRAY(_TexArray), float2 uv, float index) {
 			return UNITY_SAMPLE_TEX2DARRAY(_TexArray, float3(uv, index));
@@ -92,10 +94,12 @@ Shader "PartShaderRedux"
 			localNormal.xy *= data.z;
 			localNormal.z += 0.0001;
 
+			float4 texMRAO = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(IN.texCoords, IN.ids.y));
+
 			o.Albedo = colour;
 			o.Normal = localNormal;
-			o.Metallic = data.x;
-			o.Smoothness = data.y;
+			o.Metallic = texMRAO.r;// data.x;
+			o.Smoothness = 1.f - texMRAO.g;// data.y;
 			o.Alpha = 1.f;
 		}
 		ENDCG
