@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: -1366777262, guid: c37b925f2b4978342b2e0b83a8fa404a, type: 3}
   m_Name: ModData
   m_EditorClassIdentifier: 
-  _assemblies: []
+  _assemblies:
+  - 0Harmony.dll
+  - PBnJ.dll
   _author: Derpius
   _description: Physically based and Juno, a graphical overhaul mod
   _loadPriority: 1000
   _name: PBnJ
-  _otherAssets: []
+  _otherAssets:
+  - {fileID: 4800000, guid: 2f569e0da8161f7439d6640e65fc5608, type: 3}
   _prefabs: []
   _steamDescription: 
   _steamLanguage: English

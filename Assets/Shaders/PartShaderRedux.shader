@@ -58,34 +58,44 @@ Shader "PartShaderRedux"
 			return UNITY_SAMPLE_TEX2DARRAY(_TexArray, float3(uv, index));
 		}
 
-		float4 _Color;
 		float4 _MaterialColors[50];
 		float4 _MaterialData[50];
+		float4 _PartData[25];
 
 		struct Input
 		{
-			float2 uv_DetailTextures;
-			float2 uv_NormalMapTextures;
-			float detailIdx;
-			float normalIdx;
+			float2 texCoords;
+			float4 ids;
 		};
 
 		void vert(inout appdata_full v, out Input o) {
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 
-			o.detailIdx = floor(v.texcoord.z);
-			o.normalIdx = floor(v.texcoord.w);
+			o.texCoords = float2((v.texcoord.x * v.texcoord1.x) + frac(v.texcoord1.z), (v.texcoord.y * v.texcoord1.y) + frac(v.texcoord1.w));
+			o.texCoords /= v.texcoord.z + 1.f;
+
+			o.ids = float4(frac(v.texcoord.w) * 100, floor(v.texcoord1.z), floor(v.texcoord1.w), v.texcoord.w);
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
 		{
-			fixed4 detailColour = SampleTexArray(UNITY_PASS_TEX2DARRAY(_DetailTextures), IN.uv_DetailTextures, IN.detailIdx);
-			fixed4 normalColour = SampleTexArray(UNITY_PASS_TEX2DARRAY(_NormalMapTextures), IN.uv_NormalMapTextures, IN.normalIdx);
+			float4 colour = _MaterialColors[IN.ids.x];
+			float4 data = _MaterialData[IN.ids.x];
+			float4 partData = _PartData[IN.ids.w];
 
-			o.Albedo = float3(IN.detailIdx / 5.f, 1.f, 1.f);//detailColour.rgb * _Color.rgb;
-			o.Normal = normalColour.rgb;
-			o.Metallic = 0.f;
-			o.Smoothness = 0.f;
+			float2 texDetail = UNITY_SAMPLE_TEX2DARRAY(_DetailTextures, float3(IN.texCoords, IN.ids.y)).rg;
+			colour.rgb += (texDetail.r - 0.5019608) * data.z;
+			colour.rgb = saturate(colour.rgb);
+
+			float4 texNormal = UNITY_SAMPLE_TEX2DARRAY(_NormalMapTextures, float3(IN.texCoords, IN.ids.z));
+			fixed3 localNormal = UnpackNormal(texNormal);
+			localNormal.xy *= data.z;
+			localNormal.z += 0.0001;
+
+			o.Albedo = colour;
+			o.Normal = localNormal;
+			o.Metallic = data.x;
+			o.Smoothness = data.y;
 			o.Alpha = 1.f;
 		}
 		ENDCG
