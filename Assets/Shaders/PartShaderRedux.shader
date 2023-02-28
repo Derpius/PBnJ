@@ -94,7 +94,7 @@ Shader "PartShaderRedux"
 			localNormal.xy *= data.z;
 			localNormal.z += 0.0001;
 
-			float4 texMRAO = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(IN.texCoords, 0));//IN.ids.y));
+			float4 texMRAO = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(IN.texCoords, IN.ids.y));
 
 			o.Albedo = colour;
 			o.Normal = localNormal;
