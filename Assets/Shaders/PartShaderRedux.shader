@@ -56,13 +56,11 @@ Shader "PartShaderRedux"
 		UNITY_DECLARE_TEX2DARRAY(_NormalMapTextures);
 		UNITY_DECLARE_TEX2DARRAY(_MRAOTextures);
 
-		fixed4 SampleTexArray(UNITY_ARGS_TEX2DARRAY(_TexArray), float2 uv, float index) {
-			return UNITY_SAMPLE_TEX2DARRAY(_TexArray, float3(uv, index));
-		}
-
 		float4 _MaterialColors[50];
 		float4 _MaterialData[50];
 		float4 _PartData[25];
+
+		static const float4 METALLIC_COLOUR = float4(0.6, 0.6, 0.6, 1);
 
 		struct Input
 		{
@@ -96,7 +94,7 @@ Shader "PartShaderRedux"
 
 			float4 texMRAO = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(IN.texCoords, IN.ids.y));
 
-			o.Albedo = colour;
+			o.Albedo = lerp(METALLIC_COLOUR, colour, texMRAO.a).rgb;
 			o.Normal = localNormal;
 			o.Metallic = texMRAO.r;// data.x;
 			o.Smoothness = 1.f - texMRAO.g;// data.y;
