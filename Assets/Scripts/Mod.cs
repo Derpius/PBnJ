@@ -121,7 +121,7 @@ namespace Assets.Scripts
 			FieldInfo detailTexturesFieldInfo = typeof(Craft.Parts.Styles.PartStyleManagerScript).GetField("_detailTextures", BindingFlags.NonPublic | BindingFlags.Instance);
 			var detailTextures = detailTexturesFieldInfo.GetValue(styleManager);
 
-			var defaultMRAOTexture = this.ResourceLoader.LoadAsset<Texture2D>("Assets/Textures/MRAO/DefaultDetail.png");
+			var defaultMRAOTexture = this.ResourceLoader.LoadAsset<Texture2D>("Assets/Textures/MRAO/Fallback.png");
 
 			var texture2DArray = new Texture2DArray(defaultMRAOTexture.width, defaultMRAOTexture.height, GetPropertyValue<int>(detailTextures, "Count"), defaultMRAOTexture.format, true, true);
 			texture2DArray.Apply(false, true);
