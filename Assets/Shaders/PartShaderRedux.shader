@@ -92,12 +92,17 @@ Shader "PartShaderRedux"
 			localNormal.xy *= data.z;
 			localNormal.z += 0.0001;
 
-			float4 texMRAO = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(IN.texCoords, IN.ids.y));
+			float4 metalnessRoughnessAOMask = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(IN.texCoords, IN.ids.y));
+			metalnessRoughnessAOMask = lerp(
+				float4(data.x, 1.f - data.y, 0.f, 1.f),
+				metalnessRoughnessAOMask,
+				saturate(data.z)
+			);
 
-			o.Albedo = lerp(METALLIC_COLOUR, colour, texMRAO.a).rgb;
+			o.Albedo = lerp(METALLIC_COLOUR, colour, metalnessRoughnessAOMask.a).rgb;
 			o.Normal = localNormal;
-			o.Metallic = texMRAO.r;// data.x;
-			o.Smoothness = 1.f - texMRAO.g;// data.y;
+			o.Metallic = metalnessRoughnessAOMask.r;
+			o.Smoothness = 1.f - metalnessRoughnessAOMask.g;
 			o.Alpha = 1.f;
 		}
 		ENDCG
