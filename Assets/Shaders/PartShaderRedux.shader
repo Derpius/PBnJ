@@ -68,7 +68,8 @@ Shader "PartShaderRedux"
 			float4 ids;
 		};
 
-		void vert(inout appdata_full v, out Input o) {
+		void vert(inout appdata_full v, out Input o)
+		{
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 
 			o.texCoords = float2((v.texcoord.x * v.texcoord1.x) + frac(v.texcoord1.z), (v.texcoord.y * v.texcoord1.y) + frac(v.texcoord1.w));
