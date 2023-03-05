@@ -60,9 +60,8 @@ Shader "PartShaderRedux"
 		UNITY_DECLARE_TEX2DARRAY(_DetailTextures);
 		UNITY_DECLARE_TEX2DARRAY(_NormalMapTextures);
 		UNITY_DECLARE_TEX2DARRAY(_MRAOTextures);
-		UNITY_DECLARE_TEX2DARRAY(_HeightTextures);
 
-		#define PARALLAX_HEIGHT_TEXTURE_ARRAY _HeightTextures
+		#define PARALLAX_HEIGHT_TEXTURE_ARRAY _MRAOTextures
 		#include "POM.cginc"
 
 		float4 _MaterialColors[50];
@@ -135,8 +134,7 @@ Shader "PartShaderRedux"
 				saturate(data.z)
 			);
 
-			o.Albedo = UNITY_SAMPLE_TEX2DARRAY(_HeightTextures, float3(texcoord, IN.ids.y)).r;
-			//o.Albedo = lerp(METALLIC_COLOUR, colour, metalnessRoughnessAOMask.a).rgb;
+			o.Albedo = lerp(METALLIC_COLOUR, colour, metalnessRoughnessAOMask.a).rgb;
 			o.Normal = localNormal;
 			o.Metallic = metalnessRoughnessAOMask.r;
 			o.Smoothness = 1.f - metalnessRoughnessAOMask.g;

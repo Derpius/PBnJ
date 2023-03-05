@@ -47,9 +47,9 @@ void ParallaxOcclusionMapping(
 		texCurrentOffset -= texOffsetPerStep;
 
 		#ifdef PARALLAX_HEIGHT_TEXTURE_ARRAY
-		currHeight = UNITY_SAMPLE_TEX2DARRAY_GRAD(PARALLAX_HEIGHT_TEXTURE_ARRAY, float3(texCurrentOffset, textureArrayIndex), dx, dy).r;
+		currHeight = UNITY_SAMPLE_TEX2DARRAY_GRAD(PARALLAX_HEIGHT_TEXTURE_ARRAY, float3(texCurrentOffset, textureArrayIndex), dx, dy).b;
 		#else
-		currHeight = tex2Dgrad(heightMap, texCurrentOffset, dx, dy).r;
+		currHeight = tex2Dgrad(heightMap, texCurrentOffset, dx, dy).b;
 		#endif
 
 		currentBound -= stepSize;

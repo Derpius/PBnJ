@@ -22,7 +22,6 @@ namespace Assets.Scripts
 
 				material.shader = Assets.Scripts.Mod.Instance.partShader;
 				material.SetTexture("_MRAOTextures", Assets.Scripts.Mod.Instance.mraoTextures);
-				material.SetTexture("_HeightTextures", Assets.Scripts.Mod.Instance.heightTextures);
 			}
 		}
 
@@ -40,7 +39,6 @@ namespace Assets.Scripts
 	{
 		public Shader partShader;
 		public Texture2DArray mraoTextures;
-		public Texture2DArray heightTextures;
 
 		/// <summary>
 		/// Prevents a default instance of the <see cref="Mod"/> class from being created.
@@ -61,7 +59,7 @@ namespace Assets.Scripts
 
 			//originalPartShader = Shader.Find("Jundroo/SR Standard/SrStandardPartShader");
 			partShader = this.ResourceLoader.LoadAsset<Shader>("Assets/Shaders/PartShaderRedux.shader");
-			BuildTextureArrays();
+			mraoTextures = BuildMRAOTextureArray();
 
 			Harmony harmony = new Harmony("PhysicallyBasedAndJuno");
 			harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -79,45 +77,35 @@ namespace Assets.Scripts
 			}
 		}
 
-		private Texture2D GetTexture(string type, string name, Texture2D fallback)
+		private Texture2D GetMRAOTexture(string name, Texture2D fallback)
 		{
-			var texture = this.ResourceLoader.LoadAsset<Texture2D>(String.Format("Assets/Textures/{0}/{1}.png", type, name));
+			var texture = this.ResourceLoader.LoadAsset<Texture2D>("Assets/Textures/MRAO/" + name + ".png");
 
 			if (texture == null)
 			{
-				Debug.LogFormat("No {0} texture for {1}, falling back to default", type, name);
+				Debug.LogFormat("No MRAO texture for {0}, falling back to default", name);
 				return fallback;
 			}
 
 			if (texture.format != fallback.format)
 			{
-				Debug.LogWarningFormat("{0} texture {1} has invalid format {2}, expected {3}", type, name, texture.format, fallback.format);
+				Debug.LogWarningFormat("MRAO texture {0} has invalid format {1}, expected {2}", name, texture.format, fallback.format);
 				return fallback;
 			}
 
 			if (texture.dimension != fallback.dimension)
 			{
-				Debug.LogWarningFormat("{0} texture {1} has invalid resolution {2}x{3}, expected {4}x{5}", type, name, texture.width, texture.height, fallback.width, fallback.height);
+				Debug.LogWarningFormat("MRAO texture {0} has invalid resolution {1}x{2}, expected {3}x{4}", name, texture.width, texture.height, fallback.width, fallback.height);
 				return fallback;
 			}
 
 			if (texture.mipmapCount != fallback.mipmapCount)
 			{
-				Debug.LogWarningFormat("{0} texture {1} has invalid mipmap count {2}, expected {3}", type, name, texture.mipmapCount, fallback.mipmapCount);
+				Debug.LogWarningFormat("MRAO texture {0} has invalid mipmap count {1}, expected {2}", name, texture.mipmapCount, fallback.mipmapCount);
 				return fallback;
 			}
 
 			return texture;
-		}
-
-		private Texture2D GetMRAOTexture(string name, Texture2D fallback)
-		{
-			return GetTexture("MRAO", name, fallback);
-		}
-
-		private Texture2D GetHeightTexture(string name, Texture2D fallback)
-		{
-			return GetTexture("Height", name, fallback);
 		}
 
 		private T GetPropertyValue<T>(object instance, string name, bool isPublic = true)
@@ -126,22 +114,17 @@ namespace Assets.Scripts
 			return (T)instance.GetType().GetProperty(name, flags | BindingFlags.Instance).GetValue(instance);
 		}
 
-		private void BuildTextureArrays()
+		private Texture2DArray BuildMRAOTextureArray()
 		{
 			var styleManager = Game.Instance.PartStyleManager;
 
 			FieldInfo detailTexturesFieldInfo = typeof(Craft.Parts.Styles.PartStyleManagerScript).GetField("_detailTextures", BindingFlags.NonPublic | BindingFlags.Instance);
 			var detailTextures = detailTexturesFieldInfo.GetValue(styleManager);
-			int numTextures = GetPropertyValue<int>(detailTextures, "Count");
 
 			var defaultMRAOTexture = this.ResourceLoader.LoadAsset<Texture2D>("Assets/Textures/MRAO/Fallback.png");
-			var defaultHeightTexture = this.ResourceLoader.LoadAsset<Texture2D>("Assets/Textures/Height/Fallback.png");
 
-			mraoTextures = TextureArrayFromTexture(defaultMRAOTexture, numTextures, true, true);
-			mraoTextures.Apply(false, true);
-
-			heightTextures = TextureArrayFromTexture(defaultHeightTexture, numTextures, false, true);
-			heightTextures.Apply(false, true);
+			var texture2DArray = new Texture2DArray(defaultMRAOTexture.width, defaultMRAOTexture.height, GetPropertyValue<int>(detailTextures, "Count"), defaultMRAOTexture.format, true, true);
+			texture2DArray.Apply(false, true);
 
 			foreach (object texInfo in GetPropertyValue<IEnumerable<object>>(detailTextures, "Values"))
 			{
@@ -149,31 +132,21 @@ namespace Assets.Scripts
 				string textureName = GetPropertyValue<string>(texInfo, "Id");
 
 				Texture2D mraoTexture = GetMRAOTexture(textureName, defaultMRAOTexture);
-				Texture2D heightTexture = GetHeightTexture(textureName, defaultHeightTexture);
 
 				for (int mip = 0; mip < mraoTexture.mipmapCount; mip++)
 				{
-					Graphics.CopyTexture(mraoTexture, 0, mip, mraoTextures, arrayIndex, mip);
+					Graphics.CopyTexture(mraoTexture, 0, mip, texture2DArray, arrayIndex, mip);
 				}
-				Graphics.CopyTexture(heightTexture, 0, 0, heightTextures, arrayIndex, 0);
 
 				if (mraoTexture != defaultMRAOTexture)
 				{
 					Resources.UnloadAsset(mraoTexture);
 				}
-				if (heightTexture != defaultHeightTexture)
-				{
-					Resources.UnloadAsset(heightTexture);
-				}
 			}
 
 			Resources.UnloadAsset(defaultMRAOTexture);
-			Resources.UnloadAsset(defaultHeightTexture);
-		}
 
-		private Texture2DArray TextureArrayFromTexture(in Texture2D tex, int count, bool useMips, bool linear)
-		{
-			return new Texture2DArray(tex.width, tex.height, count, tex.format, useMips, linear);
+			return texture2DArray;
 		}
 	}
 }

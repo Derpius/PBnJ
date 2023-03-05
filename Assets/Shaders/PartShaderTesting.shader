@@ -6,7 +6,6 @@ Shader "PartShaderTesting"
 		_MetallicColour ("Colour for bare metal surfaces", Color) = (0.6, 0.6, 0.6, 1)
 
 		_DetailStrength ("Detail strength", Range(0, 2.5)) = 1
-		_OcclusionStrength ("Occlusion strength", Range(0, 1)) = 1
 
 		_ParallaxStrength ("Parallax strength", Range(0, 1)) = 1
 		_MinSamples ("Minimum number of parallax samples", Int) = 8
@@ -18,7 +17,6 @@ Shader "PartShaderTesting"
 		_DetailTexture ("Detail Texture", 2D) = "" {}
 		_NormalMapTexture ("Normal Map Texture", 2D) = "" {}
 		_MRAOTexture ("Metalness, roughness, ambient occlusion, mask texture", 2D) = "" {}
-		_HeightMap ("Height map", 2D) = "black" {}
 	}
 	SubShader
 	{
@@ -47,7 +45,6 @@ Shader "PartShaderTesting"
 		sampler2D _DetailTexture;
 		sampler2D _NormalMapTexture;
 		sampler2D _MRAOTexture;
-		sampler2D _HeightMap;
 		
 		struct v2f
 		{
@@ -92,7 +89,7 @@ Shader "PartShaderTesting"
 			fixed3 viewDir = IN.tSpace0.xyz * worldViewDir.x + IN.tSpace1.xyz * worldViewDir.y  + IN.tSpace2.xyz * worldViewDir.z;
 
 			ParallaxOcclusionMapping(
-				_HeightMap, _ParallaxStrength,
+				_MRAOTexture, _ParallaxStrength,
 				_MinSamples, _MaxSamples,
 				viewDir,
 				texcoord
@@ -118,8 +115,6 @@ Shader "PartShaderTesting"
 			o.Normal = localNormal;
 			o.Metallic = metalnessRoughnessAOMask.r;
 			o.Smoothness = 1.f - metalnessRoughnessAOMask.g;
-			o.Occlusion = lerp(1.f, metalnessRoughnessAOMask.b, _OcclusionStrength);
-			o.Alpha = 1.f;
 		}
 		ENDCG
 	}
