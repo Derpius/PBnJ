@@ -27,7 +27,7 @@ Shader "PartShaderTesting"
 
 		CGPROGRAM
 		#pragma surface surf Standard fullforwardshadows vertex:vert
-		#pragma target 3.0
+		#pragma target 3.5
 
 		#include "POM.cginc"
 
@@ -62,23 +62,25 @@ Shader "PartShaderTesting"
 		struct Input
 		{
 			float2 texcoord;
-			float3 tangentViewDir;
+			float4 posWorld;
+			float3 tSpace0;
+			float3 tSpace1;
+			float3 tSpace2;
 		};
 
 		void vert(inout v2f v, out Input o)
 		{
 			UNITY_INITIALIZE_OUTPUT(Input,o);
 
-			float4 objCam = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1.f));
-			float3 viewDir = v.vertex.xyz - objCam.xyz;
-			float3 bitangent = cross(v.normal, v.tangent.xyz) * v.tangent.w * unity_WorldTransformParams.w;
+			o.posWorld = mul(unity_ObjectToWorld, v.vertex);
+			fixed3 worldNormal = mul(v.normal.xyz, (float3x3)unity_WorldToObject);
+			fixed3 worldTangent =  normalize(mul((float3x3)unity_ObjectToWorld,v.tangent.xyz ));
+			fixed3 worldBinormal = cross(worldNormal, worldTangent) * v.tangent.w; 
+			o.tSpace0 = float3(worldTangent.x, worldBinormal.x, worldNormal.x);
+			o.tSpace1 = float3(worldTangent.y, worldBinormal.y, worldNormal.y);
+			o.tSpace2 = float3(worldTangent.z, worldBinormal.z, worldNormal.z);	
 
 			o.texcoord = v.texcoord;
-			o.tangentViewDir = normalize(float3(
-				dot(viewDir, v.tangent.xyz),
-				dot(viewDir, bitangent.xyz),
-				dot(viewDir, v.normal)
-			));
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
@@ -86,10 +88,13 @@ Shader "PartShaderTesting"
 			float4 colour = _Colour;
 			float2 texcoord = IN.texcoord;
 
+			fixed3 worldViewDir = normalize(_WorldSpaceCameraPos.xyz - IN.posWorld.xyz);
+			fixed3 viewDir = IN.tSpace0.xyz * worldViewDir.x + IN.tSpace1.xyz * worldViewDir.y  + IN.tSpace2.xyz * worldViewDir.z;
+
 			ParallaxOcclusionMapping(
 				_HeightMap, _ParallaxStrength,
 				_MinSamples, _MaxSamples,
-				IN.tangentViewDir,
+				viewDir,
 				texcoord
 			);
 

@@ -21,7 +21,10 @@ void ParallaxOcclusionMapping(
 	in float3 tangentViewDir,
 	inout float2 texcoord
 ) {
-	float2 parallaxOffsetTS = tangentViewDir.xy / tangentViewDir.z * heightScale;   
+	float2 parallaxDirection = normalize(tangentViewDir.xy);
+	float viewDirLength = length(tangentViewDir);
+	float parallaxLength = sqrt(viewDirLength * viewDirLength - tangentViewDir.z * tangentViewDir.z) / tangentViewDir.z;
+	float2 parallaxOffsetTS = parallaxDirection * parallaxLength * heightScale;   
 
 	int numSamples = (int)(lerp(maxSamples, minSamples, abs(dot(float3(0, 0, 1), tangentViewDir))));
 	float stepSize = 1.0 / (float)numSamples;

@@ -50,8 +50,7 @@ Shader "PartShaderRedux"
 
 		CGPROGRAM
 		#pragma surface surf Standard fullforwardshadows vertex:vert
-		#pragma exclude_renderers d3d9
-		#pragma target 3.0
+		#pragma target 3.5
 
 		// These have been calibrated using the test material
 		#define PARALLAX_STRENGTH 0.02
@@ -76,27 +75,30 @@ Shader "PartShaderRedux"
 		{
 			float2 texcoord;
 			float4 ids;
-			float3 tangentViewDir;
+
+			float3 posWorld;
+			float3 tSpace0;
+			float3 tSpace1;
+			float3 tSpace2;
 		};
 
 		void vert(inout appdata_full v, out Input o)
 		{
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 
-			float4 objCam = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1.f));
-			float3 viewDir = v.vertex.xyz - objCam.xyz;
-			float3 bitangent = cross(v.normal, v.tangent.xyz) * v.tangent.w * unity_WorldTransformParams.w;
-
 			o.texcoord = float2((v.texcoord.x * v.texcoord1.x) + frac(v.texcoord1.z), (v.texcoord.y * v.texcoord1.y) + frac(v.texcoord1.w));
 			o.texcoord /= v.texcoord.z + 1.f;
 
 			o.ids = float4(frac(v.texcoord.w) * 100, floor(v.texcoord1.z), floor(v.texcoord1.w), v.texcoord.w);
 
-			o.tangentViewDir = normalize(float3(
-				dot(viewDir, v.tangent.xyz),
-				dot(viewDir, bitangent.xyz),
-				dot(viewDir, v.normal)
-			));
+			o.posWorld = mul(unity_ObjectToWorld, v.vertex);
+
+			fixed3 worldNormal = mul(v.normal.xyz, (float3x3)unity_WorldToObject);
+			fixed3 worldTangent =  normalize(mul((float3x3)unity_ObjectToWorld, v.tangent.xyz));
+			fixed3 worldBinormal = cross(worldNormal, worldTangent) * v.tangent.w; 
+			o.tSpace0 = float3(worldTangent.x, worldBinormal.x, worldNormal.x);
+			o.tSpace1 = float3(worldTangent.y, worldBinormal.y, worldNormal.y);
+			o.tSpace2 = float3(worldTangent.z, worldBinormal.z, worldNormal.z);
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
@@ -106,11 +108,14 @@ Shader "PartShaderRedux"
 			float4 partData = _PartData[IN.ids.w];
 			float2 texcoord = IN.texcoord;
 
+			float3 worldViewDir = normalize(_WorldSpaceCameraPos.xyz - IN.posWorld.xyz);
+			float3 tangentViewDir = IN.tSpace0.xyz * worldViewDir.x + IN.tSpace1.xyz * worldViewDir.y  + IN.tSpace2.xyz * worldViewDir.z;
+
 			ParallaxOcclusionMapping(
 				IN.ids.y,
 				PARALLAX_STRENGTH,
 				MIN_SAMPLES, MAX_SAMPLES,
-				IN.tangentViewDir,
+				tangentViewDir,
 				texcoord
 			);
 
@@ -130,7 +135,8 @@ Shader "PartShaderRedux"
 				saturate(data.z)
 			);
 
-			o.Albedo = lerp(METALLIC_COLOUR, colour, metalnessRoughnessAOMask.a).rgb;
+			o.Albedo = UNITY_SAMPLE_TEX2DARRAY(_HeightTextures, float3(texcoord, IN.ids.y)).r;
+			//o.Albedo = lerp(METALLIC_COLOUR, colour, metalnessRoughnessAOMask.a).rgb;
 			o.Normal = localNormal;
 			o.Metallic = metalnessRoughnessAOMask.r;
 			o.Smoothness = 1.f - metalnessRoughnessAOMask.g;
