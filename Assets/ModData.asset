@@ -20,6 +20,14 @@ MonoBehaviour:
   _loadPriority: 1000
   _name: PBnJ
   _otherAssets:
+  - {fileID: 2800000, guid: e67c2caedbef15b49837f013a96f18b8, type: 3}
+  - {fileID: 2800000, guid: 04c5473a073a03a4a9f9c5b15ae32d97, type: 3}
+  - {fileID: 2800000, guid: db5802c908b13454782235812c0c88ea, type: 3}
+  - {fileID: 2800000, guid: 56e3259ba24b14a43830bdcb47d10cc8, type: 3}
+  - {fileID: 2800000, guid: 3775e5c7bb67e9a4a881accaf6e1cdee, type: 3}
+  - {fileID: 2800000, guid: b8313a297c84b364cb8f8ca059809a74, type: 3}
+  - {fileID: 2800000, guid: 742d899a064dbae4fa386411e5851d26, type: 3}
+  - {fileID: 2800000, guid: ad3d4e8b34ce7924cb299602fe0e3277, type: 3}
   - {fileID: 4800000, guid: 2f569e0da8161f7439d6640e65fc5608, type: 3}
   _prefabs: []
   _steamDescription: 

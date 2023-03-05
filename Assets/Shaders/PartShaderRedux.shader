@@ -50,11 +50,21 @@ Shader "PartShaderRedux"
 
 		CGPROGRAM
 		#pragma surface surf Standard fullforwardshadows vertex:vert
+		#pragma exclude_renderers d3d9
 		#pragma target 3.0
+
+		// These have been calibrated using the test material
+		#define PARALLAX_STRENGTH 0.02
+		#define MIN_SAMPLES 32
+		#define MAX_SAMPLES 64
 
 		UNITY_DECLARE_TEX2DARRAY(_DetailTextures);
 		UNITY_DECLARE_TEX2DARRAY(_NormalMapTextures);
 		UNITY_DECLARE_TEX2DARRAY(_MRAOTextures);
+		UNITY_DECLARE_TEX2DARRAY(_HeightTextures);
+
+		#define PARALLAX_HEIGHT_TEXTURE_ARRAY _HeightTextures
+		#include "POM.cginc"
 
 		float4 _MaterialColors[50];
 		float4 _MaterialData[50];
@@ -64,18 +74,29 @@ Shader "PartShaderRedux"
 
 		struct Input
 		{
-			float2 texCoords;
+			float2 texcoord;
 			float4 ids;
+			float3 tangentViewDir;
 		};
 
 		void vert(inout appdata_full v, out Input o)
 		{
 			UNITY_INITIALIZE_OUTPUT(Input, o);
 
-			o.texCoords = float2((v.texcoord.x * v.texcoord1.x) + frac(v.texcoord1.z), (v.texcoord.y * v.texcoord1.y) + frac(v.texcoord1.w));
-			o.texCoords /= v.texcoord.z + 1.f;
+			float4 objCam = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1.f));
+			float3 viewDir = v.vertex.xyz - objCam.xyz;
+			float3 bitangent = cross(v.normal, v.tangent.xyz) * v.tangent.w * unity_WorldTransformParams.w;
+
+			o.texcoord = float2((v.texcoord.x * v.texcoord1.x) + frac(v.texcoord1.z), (v.texcoord.y * v.texcoord1.y) + frac(v.texcoord1.w));
+			o.texcoord /= v.texcoord.z + 1.f;
 
 			o.ids = float4(frac(v.texcoord.w) * 100, floor(v.texcoord1.z), floor(v.texcoord1.w), v.texcoord.w);
+
+			o.tangentViewDir = normalize(float3(
+				dot(viewDir, v.tangent.xyz),
+				dot(viewDir, bitangent.xyz),
+				dot(viewDir, v.normal)
+			));
 		}
 
 		void surf(Input IN, inout SurfaceOutputStandard o)
@@ -83,17 +104,26 @@ Shader "PartShaderRedux"
 			float4 colour = _MaterialColors[IN.ids.x];
 			float4 data = _MaterialData[IN.ids.x];
 			float4 partData = _PartData[IN.ids.w];
+			float2 texcoord = IN.texcoord;
 
-			float2 texDetail = UNITY_SAMPLE_TEX2DARRAY(_DetailTextures, float3(IN.texCoords, IN.ids.y)).rg;
+			ParallaxOcclusionMapping(
+				IN.ids.y,
+				PARALLAX_STRENGTH,
+				MIN_SAMPLES, MAX_SAMPLES,
+				IN.tangentViewDir,
+				texcoord
+			);
+
+			float2 texDetail = UNITY_SAMPLE_TEX2DARRAY(_DetailTextures, float3(texcoord, IN.ids.y)).rg;
 			colour.rgb += (texDetail.r - 0.5019608) * data.z;
 			colour.rgb = saturate(colour.rgb);
 
-			float4 texNormal = UNITY_SAMPLE_TEX2DARRAY(_NormalMapTextures, float3(IN.texCoords, IN.ids.z));
+			float4 texNormal = UNITY_SAMPLE_TEX2DARRAY(_NormalMapTextures, float3(texcoord, IN.ids.z));
 			fixed3 localNormal = UnpackNormal(texNormal);
 			localNormal.xy *= data.z;
 			localNormal.z += 0.0001;
 
-			float4 metalnessRoughnessAOMask = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(IN.texCoords, IN.ids.y));
+			float4 metalnessRoughnessAOMask = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(texcoord, IN.ids.y));
 			metalnessRoughnessAOMask = lerp(
 				float4(data.x, 1.f - data.y, 1.f, 1.f),
 				metalnessRoughnessAOMask,
@@ -105,7 +135,6 @@ Shader "PartShaderRedux"
 			o.Metallic = metalnessRoughnessAOMask.r;
 			o.Smoothness = 1.f - metalnessRoughnessAOMask.g;
 			o.Occlusion = metalnessRoughnessAOMask.b;
-			o.Alpha = 1.f;
 		}
 		ENDCG
 	}
