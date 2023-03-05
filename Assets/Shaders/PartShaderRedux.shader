@@ -95,7 +95,7 @@ Shader "PartShaderRedux"
 
 			float4 metalnessRoughnessAOMask = UNITY_SAMPLE_TEX2DARRAY(_MRAOTextures, float3(IN.texCoords, IN.ids.y));
 			metalnessRoughnessAOMask = lerp(
-				float4(data.x, 1.f - data.y, 0.f, 1.f),
+				float4(data.x, 1.f - data.y, 1.f, 1.f),
 				metalnessRoughnessAOMask,
 				saturate(data.z)
 			);
@@ -104,6 +104,7 @@ Shader "PartShaderRedux"
 			o.Normal = localNormal;
 			o.Metallic = metalnessRoughnessAOMask.r;
 			o.Smoothness = 1.f - metalnessRoughnessAOMask.g;
+			o.Occlusion = metalnessRoughnessAOMask.b;
 			o.Alpha = 1.f;
 		}
 		ENDCG

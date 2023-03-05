@@ -9,3 +9,5 @@ Assets/_ModAssets_.meta
 *.sln
 *.csproj
 Assets/ModTools/*
+Assets/BaseGameTextures
+Assets/BaseGameTextures.meta
