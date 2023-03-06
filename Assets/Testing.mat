@@ -41,7 +41,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailTexture:
-        m_Texture: {fileID: 2800000, guid: 75450c0e9f4d1d847beb927355d2cc94, type: 3}
+        m_Texture: {fileID: 2800000, guid: c8cdc14169939d54f804d5fbc0ba465b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailTextures:
@@ -57,7 +57,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MRAOTexture:
-        m_Texture: {fileID: 2800000, guid: 02518bff513a17441ac7a5e09ae1db77, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4b2180b296c39ae4ebee615b4ce29ee8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MRAOTextures:
@@ -73,7 +73,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapTexture:
-        m_Texture: {fileID: 2800000, guid: 15cd37cd6d3be394696362403367a2fe, type: 3}
+        m_Texture: {fileID: 2800000, guid: 50710d12c7ee58b478b0cb0d4aaba54d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapTextures:
@@ -96,7 +96,7 @@ Material:
     - SCENE: 0
     - _BaseBlendModeDestination: 0
     - _BaseBlendModeSource: 1
-    - _BaseMetalness: 1
+    - _BaseMetalness: 0
     - _BaseSmoothness: 0
     - _BaseZWrite: 1
     - _BumpScale: 1
@@ -119,7 +119,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _ParallaxSamples: 40
-    - _ParallaxStrength: 0.01
+    - _ParallaxStrength: 0.02
     - _ReentryMaskBaseStrength: 2
     - _ReentryMaskWrapAmount: -1
     - _SmoothnessTextureChannel: 0
