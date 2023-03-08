@@ -27,6 +27,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: f908c08091ea2f84eb35427960f7e2f0, type: 3}
   - {fileID: 2800000, guid: 4b2180b296c39ae4ebee615b4ce29ee8, type: 3}
   - {fileID: 4800000, guid: 2f569e0da8161f7439d6640e65fc5608, type: 3}
+  - {fileID: 2800000, guid: 93e85793f37d09f4cae4bd3eb5a7b51b, type: 3}
   _prefabs: []
   _steamDescription: 
   _steamLanguage: English

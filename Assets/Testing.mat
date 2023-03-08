@@ -2,15 +2,20 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Testing
   m_Shader: {fileID: 4800000, guid: 56f89b5f458435841a5faf075f300bac, type: 3}
-  m_ShaderKeywords: DETAIL_TEXTURES_OFF NORMAL_MAPS_OFF OBJECT_ATMOSPHERE_NONE RIMSHADE_OFF
-    SCENE_OTHER
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - DETAIL_TEXTURES_OFF
+  - NORMAL_MAPS_OFF
+  - OBJECT_ATMOSPHERE_NONE
+  - RIMSHADE_OFF
+  - SCENE_OTHER
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -41,7 +46,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailTexture:
-        m_Texture: {fileID: 2800000, guid: 75450c0e9f4d1d847beb927355d2cc94, type: 3}
+        m_Texture: {fileID: 2800000, guid: f718ab05d5040ff439a0dea9cc20dd18, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailTextures:
@@ -57,7 +62,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MRAOTexture:
-        m_Texture: {fileID: 2800000, guid: ebf1d0b641b95974a919b96795deb102, type: 3}
+        m_Texture: {fileID: 2800000, guid: 15b46bc1d1f98b149bf92e1b09e14e11, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MRAOTextures:
@@ -73,7 +78,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapTexture:
-        m_Texture: {fileID: 2800000, guid: 15cd37cd6d3be394696362403367a2fe, type: 3}
+        m_Texture: {fileID: 2800000, guid: 121988597fe0c2e47ba247c6b8e6240f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapTextures:
@@ -88,6 +93,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - DETAIL_TEXTURES: 0
     - NORMAL_MAPS: 0
@@ -132,7 +138,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Colour: {r: 0.754717, g: 0.41437897, b: 0.38732645, a: 1}
+    - _Colour: {r: 0.6320754, g: 0.17660666, b: 0.13953361, a: 1}
     - _DecalTextureMaterialIds: {r: 0, g: 0, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _MetallicColour: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
